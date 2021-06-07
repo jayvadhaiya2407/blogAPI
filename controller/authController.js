@@ -1,13 +1,21 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
+const { validationResult } = require("express-validator");
 
-const throwError = (errCode, message) => {
+//Handaling Error
+const throwError = (errCode, message, data) => {
   const err = new Error(message);
   err.statusCode = errCode;
-  throw err;
+  err.data = data;
+  return err;
 };
 
+//Creating User
 exports.createUser = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(throwError(422, "Validation failed", errors.array()));
+  }
   const firstName = req.body.firstname;
   const lastName = req.body.lastname;
   const email = req.body.email;
@@ -26,6 +34,6 @@ exports.createUser = async (req, res, next) => {
       message: "User created successfully",
     });
   } catch (err) {
-    throwError(500, "Something went wrong");
+    next(throwError(500, "Something went wrong", err));
   }
 };
