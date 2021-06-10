@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
 
 //Handaling Error
 const throwError = (errCode, message, data) => {
@@ -14,7 +15,7 @@ const throwError = (errCode, message, data) => {
 exports.createUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(throwError(422, "Validation failed", errors.array()));
+    return next(throwError(400, "Validation failed", errors.array()));
   }
   const firstName = req.body.firstname;
   const lastName = req.body.lastname;
@@ -32,6 +33,37 @@ exports.createUser = async (req, res, next) => {
     res.status(201).json({
       status: true,
       message: "User created successfully",
+    });
+  } catch (err) {
+    next(throwError(500, "Something went wrong", err));
+  }
+};
+
+//Loging User
+exports.loginUser = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(throwError(400, "Validation failed", errors.array()));
+  }
+  const email = req.body.email;
+  const password = req.body.password;
+  try {
+    const user = await User.findOne({ email: email });
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return next(throwError(401, "Password not matched", null));
+    }
+    const token = await jwt.sign(
+      {
+        email: user.email,
+        userId: user._id.toString(),
+      },
+      "thisistoptoptopsecret",
+      { expiresIn: "1h" }
+    );
+    res.status(200).json({
+      status: true,
+      token: token,
     });
   } catch (err) {
     next(throwError(500, "Something went wrong", err));

@@ -6,7 +6,7 @@ const postModel = Schema({
     type: String,
     required: true,
   },
-  imageUrl: {
+  image: {
     type: String,
     required: true,
   },
@@ -35,9 +35,10 @@ const postModel = Schema({
       },
     },
   ],
-  user: {
-    type: Schema.types.ObjectId,
+  postBy: {
+    type: Schema.Types.ObjectId,
     ref: "User",
+    required: true,
   },
 });
 

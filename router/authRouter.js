@@ -39,4 +39,25 @@ router.post(
   authController.createUser
 );
 
+router.post(
+  "/login",
+  [
+    body("email")
+      .isEmail()
+      .withMessage("Please enter a valid email.")
+      .custom((value) => {
+        return User.findOne({ email: value }).then((userDoc) => {
+          if (!userDoc) {
+            return Promise.reject("E-Mail address not exists!");
+          }
+        });
+      })
+      .normalizeEmail(),
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("Password length must be atleast 8 chars"),
+  ],
+  authController.loginUser
+);
+
 module.exports = router;
