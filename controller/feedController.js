@@ -2,8 +2,7 @@ const { validationResult } = require("express-validator");
 const Post = require("../models/postModel");
 const path = require("path");
 const fs = require("fs");
-const router = require("../router/authRouter");
-const { clear } = require("console");
+const User = require("../models/userModel");
 
 const throwError = (errCode, message, data) => {
   const err = new Error(message);
@@ -65,6 +64,10 @@ exports.createPost = async (req, res, next) => {
       postBy: req.userId,
     }).save();
 
+    const user = await User.findOne({ _id: req.userId });
+    id = newPost._id;
+    user.posts.push(id);
+    await user.save();
     res.status(201).json({
       status: true,
       message: "Created successfully",
@@ -119,6 +122,9 @@ exports.deletePost = async (req, res, next) => {
     filePath = path.join(__dirname, "..", post.image);
     await clearImage(filePath, next);
     await Post.findByIdAndDelete(postId);
+    const user = await User.findOne({ _id: req.userId });
+    user.posts.pull(postId);
+    await user.save();
     return res.status(200).json({
       status: true,
       message: "Deleted Successfully",

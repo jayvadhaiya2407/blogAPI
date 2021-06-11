@@ -24,10 +24,8 @@ const userModel = new Schema({
   },
   posts: [
     {
-      post: {
-        type: Schema.Types.ObjectId,
-        ref: "Post",
-      },
+      type: Schema.Types.ObjectId,
+      ref: "Post",
     },
   ],
 });
