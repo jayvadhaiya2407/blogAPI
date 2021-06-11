@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
+const jwt = require("jsonwebtoken");
 
 const isAuth = require("./middlewares/isAuth");
 
@@ -24,15 +25,28 @@ const fileStorage = multer.diskStorage({
   },
 });
 
+//File filter
 const fileFilter = (req, file, callback) => {
   if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
+    !(
+      file.mimetype === "image/png" ||
+      file.mimetype === "image/jpg" ||
+      file.mimetype === "image/jpeg"
+    )
   ) {
-    callback(null, true);
-  } else {
     callback(null, false);
+  }
+  try {
+    const token = req.get("Authorization");
+    if (!token) return callback(null, false);
+    const decodedToken = jwt.verify(token, "thisistoptoptopsecret");
+    if (!decodedToken) {
+      callback(null, false);
+    }
+    callback(null, true);
+  } catch (err) {
+    err.statusCode = 500;
+    callback(err, false);
   }
 };
 

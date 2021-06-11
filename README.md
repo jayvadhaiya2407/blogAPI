@@ -44,6 +44,12 @@ Install dependencies with npm
   GET /feed/posts
 ```
 
+#### Get Single Post
+
+```http
+  GET /feed/posts/${postId}
+```
+
 #### Create Post
 
 ```http
@@ -57,4 +63,31 @@ Install dependencies with npm
 | `image`       | `file`   | **Required**.                             |
 | `token`       | `string` | **Required**. Autorization Token Required |
 
-##### Use Autorization Header to send token.
+##### Use Autorization Header to send token(Only token without bearer).
+
+#### Update Post
+
+```http
+  PUT /feed/post/${postId}
+```
+
+| Parameter     | Type     | Description                               |
+| :------------ | :------- | :---------------------------------------- |
+| `title`       | `string` | **Required**.                             |
+| `description` | `string` | **Required**.                             |
+| `image`       | `file`   | **Optional**.                             |
+| `token`       | `string` | **Required**. Autorization Token Required |
+
+##### Use Autorization Header to send token(Only token without bearer).
+
+#### Delete Post
+
+```http
+  DELETE /feed/post/${postId}
+```
+
+| Parameter | Type     | Description                               |
+| :-------- | :------- | :---------------------------------------- |
+| `token`   | `string` | **Required**. Autorization Token Required |
+
+##### Use Autorization Header to send token(Only token without bearer).
