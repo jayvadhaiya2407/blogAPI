@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const jwt = require("jsonwebtoken");
+const helmet = require("helmet");
 
 const isAuth = require("./middlewares/isAuth");
 
@@ -51,6 +52,7 @@ const fileFilter = (req, file, callback) => {
 };
 
 //Middlewares
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(
   multer({
