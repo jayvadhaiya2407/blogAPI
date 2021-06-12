@@ -16,10 +16,12 @@ router.post(
   [
     body("title")
       .isLength({ min: 5 })
-      .withMessage("Title must be atleast 5 char long"),
+      .withMessage("Title must be atleast 5 char long")
+      .escape(),
     body("description")
       .isLength({ min: 120 })
-      .withMessage("Description must be atleast 120 char long"),
+      .withMessage("Description must be atleast 120 char long")
+      .escape(),
     body("image").isEmpty().withMessage("Image is required"),
   ],
   isAuth,
@@ -31,10 +33,12 @@ router.put(
   [
     body("title")
       .isLength({ min: 5 })
-      .withMessage("Title must be atleast 5 char long"),
+      .withMessage("Title must be atleast 5 char long")
+      .escape(),
     body("description")
       .isLength({ min: 120 })
-      .withMessage("Description must be atleast 120 char long"),
+      .withMessage("Description must be atleast 120 char long")
+      .escape(),
   ],
   isAuth,
   feedController.updatePost
@@ -46,7 +50,7 @@ router.patch("/post/:postId", isAuth, feedController.likeDislike);
 //Add Comment
 router.patch(
   "/post/comment/:postId",
-  [body("comment").isLength({ min: 5 })],
+  [body("comment").isLength({ min: 5 }).escape()],
   isAuth,
   feedController.addComment
 );

@@ -19,7 +19,7 @@ const isAuth = (req, res, next) => {
     req.userId = decodedToken.userId;
     next();
   } catch (err) {
-    err.statusCode = 500;
+    err.statusCode = 401;
     err.messsage = "Something went wrong";
     throw err;
   }

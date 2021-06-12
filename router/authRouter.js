@@ -12,11 +12,13 @@ router.post(
     body("firstname")
       .trim()
       .isLength({ min: 3 })
-      .withMessage("Firstname must be atleast 3 char long."),
+      .withMessage("Firstname must be atleast 3 char long.")
+      .escape(),
     body("lastname")
       .trim()
       .isLength({ min: 3 })
-      .withMessage("Lastname must be atleast 3 char long."),
+      .withMessage("Lastname must be atleast 3 char long.")
+      .escape(),
     body("email")
       .isEmail()
       .withMessage("Please enter a valid email.")
@@ -34,7 +36,8 @@ router.post(
       .custom((pass, { req }) => {
         return pass === req.body.cpassword;
       })
-      .withMessage("Confirm password do not matched"),
+      .withMessage("Confirm password do not matched")
+      .escape(),
   ],
   authController.createUser
 );
@@ -55,7 +58,8 @@ router.post(
       .normalizeEmail(),
     body("password")
       .isLength({ min: 8 })
-      .withMessage("Password length must be atleast 8 chars"),
+      .withMessage("Password length must be atleast 8 chars")
+      .escape(),
   ],
   authController.loginUser
 );
