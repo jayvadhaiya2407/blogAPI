@@ -15,7 +15,9 @@ const throwError = (errCode, message, data) => {
 exports.getPosts = async (req, res, next) => {
   try {
     const posts = await (
-      await Post.find().populate("postBy", "firstname email")
+      await Post.find()
+        .populate("postBy", "firstname email")
+        .populate("comments.user", "firstname email")
     ).reverse();
     res.status(200).json({
       status: true,
@@ -30,7 +32,12 @@ exports.getPosts = async (req, res, next) => {
 exports.getByIdPost = async (req, res, next) => {
   const postId = req.params.postId;
   try {
-    const post = await Post.findOne({ _id: postId });
+    const post = await Post.findById(postId)
+      .populate("postBy", "firstname email")
+      .populate("comments.user", "firstname email");
+    if (!post) {
+      return next(throwError(422, "No post found", null));
+    }
     return res.status(200).json({
       status: true,
       post: post,
@@ -91,6 +98,9 @@ exports.updatePost = async (req, res, next) => {
   let image;
   try {
     const post = await Post.findOne({ _id: postId });
+    if (!post) {
+      return next(throwError(422, "No post found", null));
+    }
     if (req.file) {
       image = imageFile.path;
       filePath = post.image;
@@ -119,6 +129,9 @@ exports.deletePost = async (req, res, next) => {
   const postId = req.params.postId;
   try {
     const post = await Post.findOne({ _id: postId });
+    if (!post) {
+      return next(throwError(422, "No post found", null));
+    }
     filePath = path.join(__dirname, "..", post.image);
     await clearImage(filePath, next);
     await Post.findByIdAndDelete(postId);
@@ -128,6 +141,66 @@ exports.deletePost = async (req, res, next) => {
     return res.status(200).json({
       status: true,
       message: "Deleted Successfully",
+    });
+  } catch (err) {
+    return next(throwError(500, "Something went wrong", err));
+  }
+};
+
+//Like Dislike
+exports.likeDislike = async (req, res, next) => {
+  let message = "";
+  const postId = req.params.postId;
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return next(throwError(422, "No post found", null));
+    }
+    const isLiked = await post.likedBy.map((u) => {
+      return u.toString() === req.userId.toString();
+    });
+    if (isLiked.length > 0) {
+      post.likeCount -= 1;
+      post.likedBy.pull(req.userId);
+      message = "Disliked Successfully";
+    } else {
+      post.likeCount += 1;
+      post.likedBy.push(req.userId);
+      message = "Liked Successfully";
+    }
+    const updatedPost = await post.save();
+    res.status(200).json({
+      status: true,
+      message: message,
+      post: updatedPost,
+    });
+  } catch (err) {
+    return next(throwError(500, "Something went wrong", err.message));
+  }
+};
+
+//Adding Comment
+exports.addComment = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return next(throwError(400, "Validation failed", errors.array()));
+  }
+  const postId = req.params.postId;
+  const comment = req.body.comment;
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return next(throwError(422, "No post found", null));
+    }
+    post.comments.push({
+      user: req.userId,
+      comment: comment,
+    });
+    const updatedPost = await post.save();
+    res.status(200).json({
+      status: true,
+      message: "Commented",
+      post: updatedPost,
     });
   } catch (err) {
     return next(throwError(500, "Something went wrong", err));

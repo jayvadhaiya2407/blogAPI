@@ -40,6 +40,18 @@ router.put(
   feedController.updatePost
 );
 
+//Like and dislike
+router.patch("/post/:postId", isAuth, feedController.likeDislike);
+
+//Add Comment
+router.patch(
+  "/post/comment/:postId",
+  [body("comment").isLength({ min: 5 })],
+  isAuth,
+  feedController.addComment
+);
+
+//Deleting Post
 router.delete("/post/:postId", isAuth, feedController.deletePost);
 
 module.exports = router;
