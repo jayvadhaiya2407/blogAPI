@@ -14,7 +14,7 @@ Install dependencies with npm
 
 ## Runserver
 
-Install dependencies with npm
+Start server with npm
 
 ```bash
   npm start
