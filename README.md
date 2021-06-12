@@ -2,7 +2,7 @@
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
 
-A NewsAPI With Advanced Authentication And Autorization Using JWT(Json Web Tokens). Provides Fully Functionalities For Creating News Websites.
+A NewsAPI With Advanced Authentication And Autorization Using JWT(Json Web Tokens). Provides Fully Functionalities For Creating Own News Websites Fastly.
 
 ## Installation
 
